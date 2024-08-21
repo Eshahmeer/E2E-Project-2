@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vikunja-api
+  namespace: demoproject
+  labels:
+    app: vikunja-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vikunja-api
+  template:
+    metadata:
+      labels:
+        app: vikunja-api
+    spec:
+      containers:
+      - name: vikunja-api
+        image: vikunja/vikunja:latest # Updated image
+        ports:
+        - containerPort: 3456
+        env:
+        - name: VIKUNJA_LOG_LEVEL
+          value: "DEBUG"
+        - name: VIKUNJA_SERVICE_TESTINGTOKEN
+          value: "averyLongSecretToSe33dtheDB"
+        - name: VIKUNJA_DATABASE_PATH
+          value: "/db/vikunja.db"
+        volumeMounts:
+        - mountPath: /db
+          name: vikunja-db
+        securityContext:
+          runAsUser: 1000
+      volumes:
+      - name: vikunja-db
+        persistentVolumeClaim:
+          claimName: vikunja-pvc
