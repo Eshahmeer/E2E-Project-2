@@ -1,0 +1,10 @@
+apiVersion: getambassador.io/v2
+kind: Mapping
+metadata:
+  name: argocd-server
+  namespace: ambassador
+spec:
+  prefix: /argo-cd
+  rewrite: /argo-cd
+  # service: https://argocd-server.argocd.svc.cluster.local:443
+  service: argocd-server.argocd
