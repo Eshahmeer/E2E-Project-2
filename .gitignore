@@ -29,3 +29,4 @@ os-packages/
 mage_output_file.go
 mage-static
 .direnv/
+k8s/
