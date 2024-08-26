@@ -1,0 +1,2101 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"vikunja-app","product":"aes"},"name":"ambassador","namespace":"ambassador"},"spec":{"replicas":1,"selector":{"matchLabels":{"service":"ambassador"}},"template":{"metadata":{"annotations":{"consul.hashicorp.com/connect-inject":"false","sidecar.istio.io/inject":"false"},"labels":{"app.kubernetes.io/managed-by":"getambassador.io","service":"ambassador"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchLabels":{"service":"ambassador"}},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"containers":[{"env":[{"name":"AMBASSADOR_NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"HOST_IP","valueFrom":{"fieldRef":{"fieldPath":"status.hostIP"}}},{"name":"REDIS_URL","value":"ambassador-redis:6379"},{"name":"AMBASSADOR_URL","value":"https://ambassador.ambassador.svc.cluster.local"},{"name":"POLL_EVERY_SECS","value":"60"},{"name":"AMBASSADOR_INTERNAL_URL","value":"https://127.0.0.1:8443"},{"name":"AMBASSADOR_SINGLE_NAMESPACE","value":"true"},{"name":"AMBASSADOR_DRAIN_TIME","value":"600"},{"name":"AUTH_HOSTNAME","value":"http://auth-service.core-components.svc.cluster.local"}],"image":"docker.io/datawire/aes:1.11.1","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/ambassador/v0/check_alive","port":8877},"periodSeconds":3},"name":"aes","ports":[{"containerPort":8080,"name":"http"},{"containerPort":8443,"name":"https"},{"containerPort":8877,"name":"admin"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/ambassador/v0/check_ready","port":8877},"periodSeconds":3},"resources":{"limits":{"cpu":"1000m","memory":"600Mi"},"requests":{"cpu":"200m","memory":"300Mi"}},"securityContext":{"allowPrivilegeEscalation":false},"volumeMounts":[{"mountPath":"/tmp/ambassador-pod-info","name":"ambassador-pod-info"},{"mountPath":"/.config/ambassador","name":"ambassador-edge-stack-secrets","readOnly":true}]}],"restartPolicy":"Always","securityContext":{"runAsUser":8888},"serviceAccountName":"ambassador","terminationGracePeriodSeconds":0,"volumes":[{"downwardAPI":{"items":[{"fieldRef":{"fieldPath":"metadata.labels"},"path":"labels"}]},"name":"ambassador-pod-info"},{"name":"ambassador-edge-stack-secrets","secret":{"secretName":"ambassador-edge-stack"}}]}}}}
+    creationTimestamp: "2024-08-26T10:29:34Z"
+    generation: 2
+    labels:
+      app.kubernetes.io/instance: vikunja-app
+      product: aes
+    name: ambassador
+    namespace: ambassador
+    resourceVersion: "90215"
+    uid: d3cd038f-06e3-49ca-b05f-d9dbde3135db
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        service: ambassador
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          consul.hashicorp.com/connect-inject: "false"
+          sidecar.istio.io/inject: "false"
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/managed-by: getambassador.io
+          service: ambassador
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    service: ambassador
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - env:
+          - name: AMBASSADOR_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: HOST_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
+          - name: REDIS_URL
+            value: ambassador-redis:6379
+          - name: AMBASSADOR_URL
+            value: https://ambassador.ambassador.svc.cluster.local
+          - name: POLL_EVERY_SECS
+            value: "60"
+          - name: AMBASSADOR_INTERNAL_URL
+            value: https://127.0.0.1:8443
+          - name: AMBASSADOR_SINGLE_NAMESPACE
+            value: "true"
+          - name: AMBASSADOR_DRAIN_TIME
+            value: "600"
+          - name: AUTH_HOSTNAME
+            value: http://auth-service.core-components.svc.cluster.local
+          image: docker.io/datawire/aes:1.11.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ambassador/v0/check_alive
+              port: 8877
+              scheme: HTTP
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: aes
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          - containerPort: 8443
+            name: https
+            protocol: TCP
+          - containerPort: 8877
+            name: admin
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ambassador/v0/check_ready
+              port: 8877
+              scheme: HTTP
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 600Mi
+            requests:
+              cpu: 200m
+              memory: 300Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tmp/ambassador-pod-info
+            name: ambassador-pod-info
+          - mountPath: /.config/ambassador
+            name: ambassador-edge-stack-secrets
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsUser: 8888
+        serviceAccount: ambassador
+        serviceAccountName: ambassador
+        terminationGracePeriodSeconds: 0
+        volumes:
+        - downwardAPI:
+            defaultMode: 420
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.labels
+              path: labels
+          name: ambassador-pod-info
+        - name: ambassador-edge-stack-secrets
+          secret:
+            defaultMode: 420
+            secretName: ambassador-edge-stack
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-08-26T10:29:44Z"
+      lastUpdateTime: "2024-08-26T10:29:44Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2024-08-26T10:29:34Z"
+      lastUpdateTime: "2024-08-26T10:29:44Z"
+      message: ReplicaSet "ambassador-58c4dcfc84" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"vikunja-app","product":"aes"},"name":"ambassador-redis","namespace":"ambassador"},"spec":{"replicas":1,"selector":{"matchLabels":{"service":"ambassador-redis"}},"template":{"metadata":{"labels":{"service":"ambassador-redis"}},"spec":{"containers":[{"image":"redis:5.0.1","name":"redis"}],"restartPolicy":"Always"}}}}
+    creationTimestamp: "2024-08-26T10:29:34Z"
+    generation: 2
+    labels:
+      app.kubernetes.io/instance: vikunja-app
+      product: aes
+    name: ambassador-redis
+    namespace: ambassador
+    resourceVersion: "90212"
+    uid: eb0e5ef3-cfc2-4f18-b90e-4b4a0266ff93
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        service: ambassador-redis
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          service: ambassador-redis
+      spec:
+        containers:
+        - image: redis:5.0.1
+          imagePullPolicy: IfNotPresent
+          name: redis
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-08-26T10:29:36Z"
+      lastUpdateTime: "2024-08-26T10:29:36Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2024-08-26T10:29:34Z"
+      lastUpdateTime: "2024-08-26T10:29:36Z"
+      message: ReplicaSet "ambassador-redis-d56d84d6f" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"applicationset-controller","app.kubernetes.io/name":"argocd-applicationset-controller","app.kubernetes.io/part-of":"argocd"},"name":"argocd-applicationset-controller","namespace":"argocd"},"spec":{"selector":{"matchLabels":{"app.kubernetes.io/name":"argocd-applicationset-controller"}},"template":{"metadata":{"labels":{"app.kubernetes.io/name":"argocd-applicationset-controller"}},"spec":{"containers":[{"args":["/usr/local/bin/argocd-applicationset-controller"],"env":[{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_GLOBAL_PRESERVED_ANNOTATIONS","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.global.preserved.annotations","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_GLOBAL_PRESERVED_LABELS","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.global.preserved.labels","name":"argocd-cmd-params-cm","optional":true}}},{"name":"NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_ENABLE_LEADER_ELECTION","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.enable.leader.election","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_REPO_SERVER","valueFrom":{"configMapKeyRef":{"key":"repo.server","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_POLICY","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.policy","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_ENABLE_POLICY_OVERRIDE","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.enable.policy.override","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_DEBUG","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.debug","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_LOGFORMAT","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.log.format","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_LOGLEVEL","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.log.level","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_DRY_RUN","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.dryrun","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_GIT_MODULES_ENABLED","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.enable.git.submodule","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_ENABLE_PROGRESSIVE_SYNCS","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.enable.progressive.syncs","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_ENABLE_NEW_GIT_FILE_GLOBBING","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.enable.new.git.file.globbing","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_REPO_SERVER_PLAINTEXT","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.repo.server.plaintext","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_REPO_SERVER_STRICT_TLS","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.repo.server.strict.tls","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_REPO_SERVER_TIMEOUT_SECONDS","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.repo.server.timeout.seconds","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_CONCURRENT_RECONCILIATIONS","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.concurrent.reconciliations.max","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_NAMESPACES","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.namespaces","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_SCM_ROOT_CA_PATH","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.scm.root.ca.path","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_ALLOWED_SCM_PROVIDERS","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.allowed.scm.providers","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATIONSET_CONTROLLER_ENABLE_SCM_PROVIDERS","valueFrom":{"configMapKeyRef":{"key":"applicationsetcontroller.enable.scm.providers","name":"argocd-cmd-params-cm","optional":true}}}],"image":"quay.io/argoproj/argocd:v2.12.2","imagePullPolicy":"Always","name":"argocd-applicationset-controller","ports":[{"containerPort":7000,"name":"webhook"},{"containerPort":8080,"name":"metrics"}],"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"volumeMounts":[{"mountPath":"/app/config/ssh","name":"ssh-known-hosts"},{"mountPath":"/app/config/tls","name":"tls-certs"},{"mountPath":"/app/config/gpg/source","name":"gpg-keys"},{"mountPath":"/app/config/gpg/keys","name":"gpg-keyring"},{"mountPath":"/tmp","name":"tmp"},{"mountPath":"/app/config/reposerver/tls","name":"argocd-repo-server-tls"}]}],"serviceAccountName":"argocd-applicationset-controller","volumes":[{"configMap":{"name":"argocd-ssh-known-hosts-cm"},"name":"ssh-known-hosts"},{"configMap":{"name":"argocd-tls-certs-cm"},"name":"tls-certs"},{"configMap":{"name":"argocd-gpg-keys-cm"},"name":"gpg-keys"},{"emptyDir":{},"name":"gpg-keyring"},{"emptyDir":{},"name":"tmp"},{"name":"argocd-repo-server-tls","secret":{"items":[{"key":"tls.crt","path":"tls.crt"},{"key":"tls.key","path":"tls.key"},{"key":"ca.crt","path":"ca.crt"}],"optional":true,"secretName":"argocd-repo-server-tls"}}]}}}}
+    creationTimestamp: "2024-08-26T10:39:32Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: applicationset-controller
+      app.kubernetes.io/name: argocd-applicationset-controller
+      app.kubernetes.io/part-of: argocd
+    name: argocd-applicationset-controller
+    namespace: argocd
+    resourceVersion: "89718"
+    uid: fc80cbc8-33cd-4803-aad0-14a70e50310f
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: argocd-applicationset-controller
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/name: argocd-applicationset-controller
+      spec:
+        containers:
+        - args:
+          - /usr/local/bin/argocd-applicationset-controller
+          env:
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_GLOBAL_PRESERVED_ANNOTATIONS
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.global.preserved.annotations
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_GLOBAL_PRESERVED_LABELS
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.global.preserved.labels
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_ENABLE_LEADER_ELECTION
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.enable.leader.election
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_REPO_SERVER
+            valueFrom:
+              configMapKeyRef:
+                key: repo.server
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_POLICY
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.policy
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_ENABLE_POLICY_OVERRIDE
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.enable.policy.override
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_DEBUG
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.debug
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_LOGFORMAT
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.log.format
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_LOGLEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.log.level
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_DRY_RUN
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.dryrun
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_GIT_MODULES_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.enable.git.submodule
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_ENABLE_PROGRESSIVE_SYNCS
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.enable.progressive.syncs
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_ENABLE_NEW_GIT_FILE_GLOBBING
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.enable.new.git.file.globbing
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_REPO_SERVER_PLAINTEXT
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.repo.server.plaintext
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_REPO_SERVER_STRICT_TLS
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.repo.server.strict.tls
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_REPO_SERVER_TIMEOUT_SECONDS
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.repo.server.timeout.seconds
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_CONCURRENT_RECONCILIATIONS
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.concurrent.reconciliations.max
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_NAMESPACES
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.namespaces
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_SCM_ROOT_CA_PATH
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.scm.root.ca.path
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_ALLOWED_SCM_PROVIDERS
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.allowed.scm.providers
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATIONSET_CONTROLLER_ENABLE_SCM_PROVIDERS
+            valueFrom:
+              configMapKeyRef:
+                key: applicationsetcontroller.enable.scm.providers
+                name: argocd-cmd-params-cm
+                optional: true
+          image: quay.io/argoproj/argocd:v2.12.2
+          imagePullPolicy: Always
+          name: argocd-applicationset-controller
+          ports:
+          - containerPort: 7000
+            name: webhook
+            protocol: TCP
+          - containerPort: 8080
+            name: metrics
+            protocol: TCP
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config/ssh
+            name: ssh-known-hosts
+          - mountPath: /app/config/tls
+            name: tls-certs
+          - mountPath: /app/config/gpg/source
+            name: gpg-keys
+          - mountPath: /app/config/gpg/keys
+            name: gpg-keyring
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /app/config/reposerver/tls
+            name: argocd-repo-server-tls
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: argocd-applicationset-controller
+        serviceAccountName: argocd-applicationset-controller
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: argocd-ssh-known-hosts-cm
+          name: ssh-known-hosts
+        - configMap:
+            defaultMode: 420
+            name: argocd-tls-certs-cm
+          name: tls-certs
+        - configMap:
+            defaultMode: 420
+            name: argocd-gpg-keys-cm
+          name: gpg-keys
+        - emptyDir: {}
+          name: gpg-keyring
+        - emptyDir: {}
+          name: tmp
+        - name: argocd-repo-server-tls
+          secret:
+            defaultMode: 420
+            items:
+            - key: tls.crt
+              path: tls.crt
+            - key: tls.key
+              path: tls.key
+            - key: ca.crt
+              path: ca.crt
+            optional: true
+            secretName: argocd-repo-server-tls
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-08-26T10:39:59Z"
+      lastUpdateTime: "2024-08-26T10:39:59Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2024-08-26T10:39:32Z"
+      lastUpdateTime: "2024-08-26T10:39:59Z"
+      message: ReplicaSet "argocd-applicationset-controller-7f4bc7899" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"dex-server","app.kubernetes.io/name":"argocd-dex-server","app.kubernetes.io/part-of":"argocd"},"name":"argocd-dex-server","namespace":"argocd"},"spec":{"selector":{"matchLabels":{"app.kubernetes.io/name":"argocd-dex-server"}},"template":{"metadata":{"labels":{"app.kubernetes.io/name":"argocd-dex-server"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchLabels":{"app.kubernetes.io/part-of":"argocd"}},"topologyKey":"kubernetes.io/hostname"},"weight":5}]}},"containers":[{"command":["/shared/argocd-dex","rundex"],"env":[{"name":"ARGOCD_DEX_SERVER_DISABLE_TLS","valueFrom":{"configMapKeyRef":{"key":"dexserver.disable.tls","name":"argocd-cmd-params-cm","optional":true}}}],"image":"ghcr.io/dexidp/dex:v2.38.0","imagePullPolicy":"Always","name":"dex","ports":[{"containerPort":5556},{"containerPort":5557},{"containerPort":5558}],"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"volumeMounts":[{"mountPath":"/shared","name":"static-files"},{"mountPath":"/tmp","name":"dexconfig"},{"mountPath":"/tls","name":"argocd-dex-server-tls"}]}],"initContainers":[{"command":["/bin/cp","-n","/usr/local/bin/argocd","/shared/argocd-dex"],"image":"quay.io/argoproj/argocd:v2.12.2","imagePullPolicy":"Always","name":"copyutil","securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"volumeMounts":[{"mountPath":"/shared","name":"static-files"},{"mountPath":"/tmp","name":"dexconfig"}]}],"serviceAccountName":"argocd-dex-server","volumes":[{"emptyDir":{},"name":"static-files"},{"emptyDir":{},"name":"dexconfig"},{"name":"argocd-dex-server-tls","secret":{"items":[{"key":"tls.crt","path":"tls.crt"},{"key":"tls.key","path":"tls.key"},{"key":"ca.crt","path":"ca.crt"}],"optional":true,"secretName":"argocd-dex-server-tls"}}]}}}}
+    creationTimestamp: "2024-08-26T10:39:32Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: dex-server
+      app.kubernetes.io/name: argocd-dex-server
+      app.kubernetes.io/part-of: argocd
+    name: argocd-dex-server
+    namespace: argocd
+    resourceVersion: "89843"
+    uid: 15978474-8cc0-46de-bbc5-a427b1a89964
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: argocd-dex-server
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/name: argocd-dex-server
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/part-of: argocd
+                topologyKey: kubernetes.io/hostname
+              weight: 5
+        containers:
+        - command:
+          - /shared/argocd-dex
+          - rundex
+          env:
+          - name: ARGOCD_DEX_SERVER_DISABLE_TLS
+            valueFrom:
+              configMapKeyRef:
+                key: dexserver.disable.tls
+                name: argocd-cmd-params-cm
+                optional: true
+          image: ghcr.io/dexidp/dex:v2.38.0
+          imagePullPolicy: Always
+          name: dex
+          ports:
+          - containerPort: 5556
+            protocol: TCP
+          - containerPort: 5557
+            protocol: TCP
+          - containerPort: 5558
+            protocol: TCP
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /shared
+            name: static-files
+          - mountPath: /tmp
+            name: dexconfig
+          - mountPath: /tls
+            name: argocd-dex-server-tls
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - /bin/cp
+          - -n
+          - /usr/local/bin/argocd
+          - /shared/argocd-dex
+          image: quay.io/argoproj/argocd:v2.12.2
+          imagePullPolicy: Always
+          name: copyutil
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /shared
+            name: static-files
+          - mountPath: /tmp
+            name: dexconfig
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: argocd-dex-server
+        serviceAccountName: argocd-dex-server
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: static-files
+        - emptyDir: {}
+          name: dexconfig
+        - name: argocd-dex-server-tls
+          secret:
+            defaultMode: 420
+            items:
+            - key: tls.crt
+              path: tls.crt
+            - key: tls.key
+              path: tls.key
+            - key: ca.crt
+              path: ca.crt
+            optional: true
+            secretName: argocd-dex-server-tls
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-08-26T10:40:33Z"
+      lastUpdateTime: "2024-08-26T10:40:33Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2024-08-26T10:39:32Z"
+      lastUpdateTime: "2024-08-26T10:40:33Z"
+      message: ReplicaSet "argocd-dex-server-7d8ff5448c" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"notifications-controller","app.kubernetes.io/name":"argocd-notifications-controller","app.kubernetes.io/part-of":"argocd"},"name":"argocd-notifications-controller","namespace":"argocd"},"spec":{"selector":{"matchLabels":{"app.kubernetes.io/name":"argocd-notifications-controller"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"labels":{"app.kubernetes.io/name":"argocd-notifications-controller"}},"spec":{"containers":[{"args":["/usr/local/bin/argocd-notifications"],"env":[{"name":"ARGOCD_NOTIFICATIONS_CONTROLLER_LOGFORMAT","valueFrom":{"configMapKeyRef":{"key":"notificationscontroller.log.format","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_NOTIFICATIONS_CONTROLLER_LOGLEVEL","valueFrom":{"configMapKeyRef":{"key":"notificationscontroller.log.level","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATION_NAMESPACES","valueFrom":{"configMapKeyRef":{"key":"application.namespaces","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_NOTIFICATION_CONTROLLER_SELF_SERVICE_NOTIFICATION_ENABLED","valueFrom":{"configMapKeyRef":{"key":"notificationscontroller.selfservice.enabled","name":"argocd-cmd-params-cm","optional":true}}}],"image":"quay.io/argoproj/argocd:v2.12.2","imagePullPolicy":"Always","livenessProbe":{"tcpSocket":{"port":9001}},"name":"argocd-notifications-controller","securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"volumeMounts":[{"mountPath":"/app/config/tls","name":"tls-certs"},{"mountPath":"/app/config/reposerver/tls","name":"argocd-repo-server-tls"}],"workingDir":"/app"}],"securityContext":{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"serviceAccountName":"argocd-notifications-controller","volumes":[{"configMap":{"name":"argocd-tls-certs-cm"},"name":"tls-certs"},{"name":"argocd-repo-server-tls","secret":{"items":[{"key":"tls.crt","path":"tls.crt"},{"key":"tls.key","path":"tls.key"},{"key":"ca.crt","path":"ca.crt"}],"optional":true,"secretName":"argocd-repo-server-tls"}}]}}}}
+    creationTimestamp: "2024-08-26T10:39:32Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: notifications-controller
+      app.kubernetes.io/name: argocd-notifications-controller
+      app.kubernetes.io/part-of: argocd
+    name: argocd-notifications-controller
+    namespace: argocd
+    resourceVersion: "89761"
+    uid: 19317bc0-09c5-48aa-9d77-5d6c958aac1d
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: argocd-notifications-controller
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/name: argocd-notifications-controller
+      spec:
+        containers:
+        - args:
+          - /usr/local/bin/argocd-notifications
+          env:
+          - name: ARGOCD_NOTIFICATIONS_CONTROLLER_LOGFORMAT
+            valueFrom:
+              configMapKeyRef:
+                key: notificationscontroller.log.format
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_NOTIFICATIONS_CONTROLLER_LOGLEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: notificationscontroller.log.level
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATION_NAMESPACES
+            valueFrom:
+              configMapKeyRef:
+                key: application.namespaces
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_NOTIFICATION_CONTROLLER_SELF_SERVICE_NOTIFICATION_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                key: notificationscontroller.selfservice.enabled
+                name: argocd-cmd-params-cm
+                optional: true
+          image: quay.io/argoproj/argocd:v2.12.2
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 9001
+            timeoutSeconds: 1
+          name: argocd-notifications-controller
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config/tls
+            name: tls-certs
+          - mountPath: /app/config/reposerver/tls
+            name: argocd-repo-server-tls
+          workingDir: /app
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        serviceAccount: argocd-notifications-controller
+        serviceAccountName: argocd-notifications-controller
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: argocd-tls-certs-cm
+          name: tls-certs
+        - name: argocd-repo-server-tls
+          secret:
+            defaultMode: 420
+            items:
+            - key: tls.crt
+              path: tls.crt
+            - key: tls.key
+              path: tls.key
+            - key: ca.crt
+              path: ca.crt
+            optional: true
+            secretName: argocd-repo-server-tls
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-08-26T10:40:15Z"
+      lastUpdateTime: "2024-08-26T10:40:15Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2024-08-26T10:39:32Z"
+      lastUpdateTime: "2024-08-26T10:40:15Z"
+      message: ReplicaSet "argocd-notifications-controller-6dd84889f7" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"redis","app.kubernetes.io/name":"argocd-redis","app.kubernetes.io/part-of":"argocd"},"name":"argocd-redis","namespace":"argocd"},"spec":{"selector":{"matchLabels":{"app.kubernetes.io/name":"argocd-redis"}},"template":{"metadata":{"labels":{"app.kubernetes.io/name":"argocd-redis"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchLabels":{"app.kubernetes.io/name":"argocd-redis"}},"topologyKey":"kubernetes.io/hostname"},"weight":100},{"podAffinityTerm":{"labelSelector":{"matchLabels":{"app.kubernetes.io/part-of":"argocd"}},"topologyKey":"kubernetes.io/hostname"},"weight":5}]}},"containers":[{"args":["--save","","--appendonly","no","--requirepass $(REDIS_PASSWORD)"],"env":[{"name":"REDIS_PASSWORD","valueFrom":{"secretKeyRef":{"key":"auth","name":"argocd-redis"}}}],"image":"redis:7.0.15-alpine","imagePullPolicy":"Always","name":"redis","ports":[{"containerPort":6379}],"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}}],"initContainers":[{"command":["argocd","admin","redis-initial-password"],"image":"quay.io/argoproj/argocd:v2.12.2","imagePullPolicy":"IfNotPresent","name":"secret-init","securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}}],"securityContext":{"runAsNonRoot":true,"runAsUser":999,"seccompProfile":{"type":"RuntimeDefault"}},"serviceAccountName":"argocd-redis"}}}}
+    creationTimestamp: "2024-08-26T10:39:32Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: redis
+      app.kubernetes.io/name: argocd-redis
+      app.kubernetes.io/part-of: argocd
+    name: argocd-redis
+    namespace: argocd
+    resourceVersion: "89855"
+    uid: a0cbf853-7e07-40ef-a884-3573da3f09e8
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: argocd-redis
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/name: argocd-redis
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: argocd-redis
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/part-of: argocd
+                topologyKey: kubernetes.io/hostname
+              weight: 5
+        containers:
+        - args:
+          - --save
+          - ""
+          - --appendonly
+          - "no"
+          - --requirepass $(REDIS_PASSWORD)
+          env:
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: auth
+                name: argocd-redis
+          image: redis:7.0.15-alpine
+          imagePullPolicy: Always
+          name: redis
+          ports:
+          - containerPort: 6379
+            protocol: TCP
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - argocd
+          - admin
+          - redis-initial-password
+          image: quay.io/argoproj/argocd:v2.12.2
+          imagePullPolicy: IfNotPresent
+          name: secret-init
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 999
+          seccompProfile:
+            type: RuntimeDefault
+        serviceAccount: argocd-redis
+        serviceAccountName: argocd-redis
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-08-26T10:40:37Z"
+      lastUpdateTime: "2024-08-26T10:40:37Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2024-08-26T10:39:32Z"
+      lastUpdateTime: "2024-08-26T10:40:37Z"
+      message: ReplicaSet "argocd-redis-64757fb989" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"repo-server","app.kubernetes.io/name":"argocd-repo-server","app.kubernetes.io/part-of":"argocd"},"name":"argocd-repo-server","namespace":"argocd"},"spec":{"selector":{"matchLabels":{"app.kubernetes.io/name":"argocd-repo-server"}},"template":{"metadata":{"labels":{"app.kubernetes.io/name":"argocd-repo-server"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchLabels":{"app.kubernetes.io/name":"argocd-repo-server"}},"topologyKey":"kubernetes.io/hostname"},"weight":100},{"podAffinityTerm":{"labelSelector":{"matchLabels":{"app.kubernetes.io/part-of":"argocd"}},"topologyKey":"kubernetes.io/hostname"},"weight":5}]}},"automountServiceAccountToken":false,"containers":[{"args":["/usr/local/bin/argocd-repo-server"],"env":[{"name":"REDIS_PASSWORD","valueFrom":{"secretKeyRef":{"key":"auth","name":"argocd-redis"}}},{"name":"ARGOCD_RECONCILIATION_TIMEOUT","valueFrom":{"configMapKeyRef":{"key":"timeout.reconciliation","name":"argocd-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_LOGFORMAT","valueFrom":{"configMapKeyRef":{"key":"reposerver.log.format","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_LOGLEVEL","valueFrom":{"configMapKeyRef":{"key":"reposerver.log.level","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_PARALLELISM_LIMIT","valueFrom":{"configMapKeyRef":{"key":"reposerver.parallelism.limit","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_LISTEN_ADDRESS","valueFrom":{"configMapKeyRef":{"key":"reposerver.listen.address","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_LISTEN_METRICS_ADDRESS","valueFrom":{"configMapKeyRef":{"key":"reposerver.metrics.listen.address","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_DISABLE_TLS","valueFrom":{"configMapKeyRef":{"key":"reposerver.disable.tls","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_TLS_MIN_VERSION","valueFrom":{"configMapKeyRef":{"key":"reposerver.tls.minversion","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_TLS_MAX_VERSION","valueFrom":{"configMapKeyRef":{"key":"reposerver.tls.maxversion","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_TLS_CIPHERS","valueFrom":{"configMapKeyRef":{"key":"reposerver.tls.ciphers","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_CACHE_EXPIRATION","valueFrom":{"configMapKeyRef":{"key":"reposerver.repo.cache.expiration","name":"argocd-cmd-params-cm","optional":true}}},{"name":"REDIS_SERVER","valueFrom":{"configMapKeyRef":{"key":"redis.server","name":"argocd-cmd-params-cm","optional":true}}},{"name":"REDIS_COMPRESSION","valueFrom":{"configMapKeyRef":{"key":"redis.compression","name":"argocd-cmd-params-cm","optional":true}}},{"name":"REDISDB","valueFrom":{"configMapKeyRef":{"key":"redis.db","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_DEFAULT_CACHE_EXPIRATION","valueFrom":{"configMapKeyRef":{"key":"reposerver.default.cache.expiration","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_OTLP_ADDRESS","valueFrom":{"configMapKeyRef":{"key":"otlp.address","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_OTLP_INSECURE","valueFrom":{"configMapKeyRef":{"key":"otlp.insecure","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_OTLP_HEADERS","valueFrom":{"configMapKeyRef":{"key":"otlp.headers","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_MAX_COMBINED_DIRECTORY_MANIFESTS_SIZE","valueFrom":{"configMapKeyRef":{"key":"reposerver.max.combined.directory.manifests.size","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_PLUGIN_TAR_EXCLUSIONS","valueFrom":{"configMapKeyRef":{"key":"reposerver.plugin.tar.exclusions","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_ALLOW_OUT_OF_BOUNDS_SYMLINKS","valueFrom":{"configMapKeyRef":{"key":"reposerver.allow.oob.symlinks","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_STREAMED_MANIFEST_MAX_TAR_SIZE","valueFrom":{"configMapKeyRef":{"key":"reposerver.streamed.manifest.max.tar.size","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_STREAMED_MANIFEST_MAX_EXTRACTED_SIZE","valueFrom":{"configMapKeyRef":{"key":"reposerver.streamed.manifest.max.extracted.size","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_HELM_MANIFEST_MAX_EXTRACTED_SIZE","valueFrom":{"configMapKeyRef":{"key":"reposerver.helm.manifest.max.extracted.size","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_DISABLE_HELM_MANIFEST_MAX_EXTRACTED_SIZE","valueFrom":{"configMapKeyRef":{"key":"reposerver.disable.helm.manifest.max.extracted.size","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REVISION_CACHE_LOCK_TIMEOUT","valueFrom":{"configMapKeyRef":{"key":"reposerver.revision.cache.lock.timeout","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_GIT_MODULES_ENABLED","valueFrom":{"configMapKeyRef":{"key":"reposerver.enable.git.submodule","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_GIT_LS_REMOTE_PARALLELISM_LIMIT","valueFrom":{"configMapKeyRef":{"key":"reposerver.git.lsremote.parallelism.limit","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_GIT_REQUEST_TIMEOUT","valueFrom":{"configMapKeyRef":{"key":"reposerver.git.request.timeout","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_GRPC_MAX_SIZE_MB","valueFrom":{"configMapKeyRef":{"key":"reposerver.grpc.max.size","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_REPO_SERVER_INCLUDE_HIDDEN_DIRECTORIES","valueFrom":{"configMapKeyRef":{"key":"reposerver.include.hidden.directories","name":"argocd-cmd-params-cm","optional":true}}},{"name":"HELM_CACHE_HOME","value":"/helm-working-dir"},{"name":"HELM_CONFIG_HOME","value":"/helm-working-dir"},{"name":"HELM_DATA_HOME","value":"/helm-working-dir"}],"image":"quay.io/argoproj/argocd:v2.12.2","imagePullPolicy":"Always","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/healthz?full=true","port":8084},"initialDelaySeconds":30,"periodSeconds":30,"timeoutSeconds":5},"name":"argocd-repo-server","ports":[{"containerPort":8081},{"containerPort":8084}],"readinessProbe":{"httpGet":{"path":"/healthz","port":8084},"initialDelaySeconds":5,"periodSeconds":10},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"volumeMounts":[{"mountPath":"/app/config/ssh","name":"ssh-known-hosts"},{"mountPath":"/app/config/tls","name":"tls-certs"},{"mountPath":"/app/config/gpg/source","name":"gpg-keys"},{"mountPath":"/app/config/gpg/keys","name":"gpg-keyring"},{"mountPath":"/app/config/reposerver/tls","name":"argocd-repo-server-tls"},{"mountPath":"/tmp","name":"tmp"},{"mountPath":"/helm-working-dir","name":"helm-working-dir"},{"mountPath":"/home/argocd/cmp-server/plugins","name":"plugins"}]}],"initContainers":[{"command":["/bin/cp","-n","/usr/local/bin/argocd","/var/run/argocd/argocd-cmp-server"],"image":"quay.io/argoproj/argocd:v2.12.2","name":"copyutil","securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"volumeMounts":[{"mountPath":"/var/run/argocd","name":"var-files"}]}],"serviceAccountName":"argocd-repo-server","volumes":[{"configMap":{"name":"argocd-ssh-known-hosts-cm"},"name":"ssh-known-hosts"},{"configMap":{"name":"argocd-tls-certs-cm"},"name":"tls-certs"},{"configMap":{"name":"argocd-gpg-keys-cm"},"name":"gpg-keys"},{"emptyDir":{},"name":"gpg-keyring"},{"emptyDir":{},"name":"tmp"},{"emptyDir":{},"name":"helm-working-dir"},{"name":"argocd-repo-server-tls","secret":{"items":[{"key":"tls.crt","path":"tls.crt"},{"key":"tls.key","path":"tls.key"},{"key":"ca.crt","path":"ca.crt"}],"optional":true,"secretName":"argocd-repo-server-tls"}},{"emptyDir":{},"name":"var-files"},{"emptyDir":{},"name":"plugins"}]}}}}
+    creationTimestamp: "2024-08-26T10:39:32Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: repo-server
+      app.kubernetes.io/name: argocd-repo-server
+      app.kubernetes.io/part-of: argocd
+    name: argocd-repo-server
+    namespace: argocd
+    resourceVersion: "89890"
+    uid: 15c3730a-1695-4511-b777-5eb866d86b05
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: argocd-repo-server
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/name: argocd-repo-server
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: argocd-repo-server
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/part-of: argocd
+                topologyKey: kubernetes.io/hostname
+              weight: 5
+        automountServiceAccountToken: false
+        containers:
+        - args:
+          - /usr/local/bin/argocd-repo-server
+          env:
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: auth
+                name: argocd-redis
+          - name: ARGOCD_RECONCILIATION_TIMEOUT
+            valueFrom:
+              configMapKeyRef:
+                key: timeout.reconciliation
+                name: argocd-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_LOGFORMAT
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.log.format
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_LOGLEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.log.level
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_PARALLELISM_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.parallelism.limit
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_LISTEN_ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.listen.address
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_LISTEN_METRICS_ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.metrics.listen.address
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_DISABLE_TLS
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.disable.tls
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_TLS_MIN_VERSION
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.tls.minversion
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_TLS_MAX_VERSION
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.tls.maxversion
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_TLS_CIPHERS
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.tls.ciphers
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_CACHE_EXPIRATION
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.repo.cache.expiration
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: REDIS_SERVER
+            valueFrom:
+              configMapKeyRef:
+                key: redis.server
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: REDIS_COMPRESSION
+            valueFrom:
+              configMapKeyRef:
+                key: redis.compression
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: REDISDB
+            valueFrom:
+              configMapKeyRef:
+                key: redis.db
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_DEFAULT_CACHE_EXPIRATION
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.default.cache.expiration
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_OTLP_ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                key: otlp.address
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_OTLP_INSECURE
+            valueFrom:
+              configMapKeyRef:
+                key: otlp.insecure
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_OTLP_HEADERS
+            valueFrom:
+              configMapKeyRef:
+                key: otlp.headers
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_MAX_COMBINED_DIRECTORY_MANIFESTS_SIZE
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.max.combined.directory.manifests.size
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_PLUGIN_TAR_EXCLUSIONS
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.plugin.tar.exclusions
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_ALLOW_OUT_OF_BOUNDS_SYMLINKS
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.allow.oob.symlinks
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_STREAMED_MANIFEST_MAX_TAR_SIZE
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.streamed.manifest.max.tar.size
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_STREAMED_MANIFEST_MAX_EXTRACTED_SIZE
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.streamed.manifest.max.extracted.size
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_HELM_MANIFEST_MAX_EXTRACTED_SIZE
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.helm.manifest.max.extracted.size
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_DISABLE_HELM_MANIFEST_MAX_EXTRACTED_SIZE
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.disable.helm.manifest.max.extracted.size
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REVISION_CACHE_LOCK_TIMEOUT
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.revision.cache.lock.timeout
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_GIT_MODULES_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.enable.git.submodule
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_GIT_LS_REMOTE_PARALLELISM_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.git.lsremote.parallelism.limit
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_GIT_REQUEST_TIMEOUT
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.git.request.timeout
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_GRPC_MAX_SIZE_MB
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.grpc.max.size
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_REPO_SERVER_INCLUDE_HIDDEN_DIRECTORIES
+            valueFrom:
+              configMapKeyRef:
+                key: reposerver.include.hidden.directories
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: HELM_CACHE_HOME
+            value: /helm-working-dir
+          - name: HELM_CONFIG_HOME
+            value: /helm-working-dir
+          - name: HELM_DATA_HOME
+            value: /helm-working-dir
+          image: quay.io/argoproj/argocd:v2.12.2
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz?full=true
+              port: 8084
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: argocd-repo-server
+          ports:
+          - containerPort: 8081
+            protocol: TCP
+          - containerPort: 8084
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8084
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config/ssh
+            name: ssh-known-hosts
+          - mountPath: /app/config/tls
+            name: tls-certs
+          - mountPath: /app/config/gpg/source
+            name: gpg-keys
+          - mountPath: /app/config/gpg/keys
+            name: gpg-keyring
+          - mountPath: /app/config/reposerver/tls
+            name: argocd-repo-server-tls
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /helm-working-dir
+            name: helm-working-dir
+          - mountPath: /home/argocd/cmp-server/plugins
+            name: plugins
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - /bin/cp
+          - -n
+          - /usr/local/bin/argocd
+          - /var/run/argocd/argocd-cmp-server
+          image: quay.io/argoproj/argocd:v2.12.2
+          imagePullPolicy: IfNotPresent
+          name: copyutil
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/run/argocd
+            name: var-files
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: argocd-repo-server
+        serviceAccountName: argocd-repo-server
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: argocd-ssh-known-hosts-cm
+          name: ssh-known-hosts
+        - configMap:
+            defaultMode: 420
+            name: argocd-tls-certs-cm
+          name: tls-certs
+        - configMap:
+            defaultMode: 420
+            name: argocd-gpg-keys-cm
+          name: gpg-keys
+        - emptyDir: {}
+          name: gpg-keyring
+        - emptyDir: {}
+          name: tmp
+        - emptyDir: {}
+          name: helm-working-dir
+        - name: argocd-repo-server-tls
+          secret:
+            defaultMode: 420
+            items:
+            - key: tls.crt
+              path: tls.crt
+            - key: tls.key
+              path: tls.key
+            - key: ca.crt
+              path: ca.crt
+            optional: true
+            secretName: argocd-repo-server-tls
+        - emptyDir: {}
+          name: var-files
+        - emptyDir: {}
+          name: plugins
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-08-26T10:40:52Z"
+      lastUpdateTime: "2024-08-26T10:40:52Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2024-08-26T10:39:32Z"
+      lastUpdateTime: "2024-08-26T10:40:52Z"
+      message: ReplicaSet "argocd-repo-server-8bfb86c4c" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"deployment.kubernetes.io/revision":"2"},"creationTimestamp":"2024-08-26T10:30:17Z","generation":3,"labels":{"app.kubernetes.io/component":"server","app.kubernetes.io/name":"argocd-server","app.kubernetes.io/part-of":"argocd"},"name":"argocd-server","namespace":"argocd","resourceVersion":"89837","uid":"e1707ace-1c95-4286-b7d1-0cf114522b92"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app.kubernetes.io/name":"argocd-server"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app.kubernetes.io/name":"argocd-server"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchLabels":{"app.kubernetes.io/name":"argocd-server"}},"topologyKey":"kubernetes.io/hostname"},"weight":100},{"podAffinityTerm":{"labelSelector":{"matchLabels":{"app.kubernetes.io/part-of":"argocd"}},"topologyKey":"kubernetes.io/hostname"},"weight":5}]}},"containers":[{"args":["/usr/local/bin/argocd-server","--rootpath=/argo-cd","--insecure"],"env":[{"name":"REDIS_PASSWORD","valueFrom":{"secretKeyRef":{"key":"auth","name":"argocd-redis"}}},{"name":"ARGOCD_SERVER_INSECURE","valueFrom":{"configMapKeyRef":{"key":"server.insecure","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_BASEHREF","valueFrom":{"configMapKeyRef":{"key":"server.basehref","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_ROOTPATH","valueFrom":{"configMapKeyRef":{"key":"server.rootpath","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_LOGFORMAT","valueFrom":{"configMapKeyRef":{"key":"server.log.format","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_LOG_LEVEL","valueFrom":{"configMapKeyRef":{"key":"server.log.level","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_REPO_SERVER","valueFrom":{"configMapKeyRef":{"key":"repo.server","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_DEX_SERVER","valueFrom":{"configMapKeyRef":{"key":"server.dex.server","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_DISABLE_AUTH","valueFrom":{"configMapKeyRef":{"key":"server.disable.auth","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_ENABLE_GZIP","valueFrom":{"configMapKeyRef":{"key":"server.enable.gzip","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_REPO_SERVER_TIMEOUT_SECONDS","valueFrom":{"configMapKeyRef":{"key":"server.repo.server.timeout.seconds","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_X_FRAME_OPTIONS","valueFrom":{"configMapKeyRef":{"key":"server.x.frame.options","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_CONTENT_SECURITY_POLICY","valueFrom":{"configMapKeyRef":{"key":"server.content.security.policy","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_REPO_SERVER_PLAINTEXT","valueFrom":{"configMapKeyRef":{"key":"server.repo.server.plaintext","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_REPO_SERVER_STRICT_TLS","valueFrom":{"configMapKeyRef":{"key":"server.repo.server.strict.tls","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_DEX_SERVER_PLAINTEXT","valueFrom":{"configMapKeyRef":{"key":"server.dex.server.plaintext","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_DEX_SERVER_STRICT_TLS","valueFrom":{"configMapKeyRef":{"key":"server.dex.server.strict.tls","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_TLS_MIN_VERSION","valueFrom":{"configMapKeyRef":{"key":"server.tls.minversion","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_TLS_MAX_VERSION","valueFrom":{"configMapKeyRef":{"key":"server.tls.maxversion","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_TLS_CIPHERS","valueFrom":{"configMapKeyRef":{"key":"server.tls.ciphers","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_CONNECTION_STATUS_CACHE_EXPIRATION","valueFrom":{"configMapKeyRef":{"key":"server.connection.status.cache.expiration","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_OIDC_CACHE_EXPIRATION","valueFrom":{"configMapKeyRef":{"key":"server.oidc.cache.expiration","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_LOGIN_ATTEMPTS_EXPIRATION","valueFrom":{"configMapKeyRef":{"key":"server.login.attempts.expiration","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_STATIC_ASSETS","valueFrom":{"configMapKeyRef":{"key":"server.staticassets","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APP_STATE_CACHE_EXPIRATION","valueFrom":{"configMapKeyRef":{"key":"server.app.state.cache.expiration","name":"argocd-cmd-params-cm","optional":true}}},{"name":"REDIS_SERVER","valueFrom":{"configMapKeyRef":{"key":"redis.server","name":"argocd-cmd-params-cm","optional":true}}},{"name":"REDIS_COMPRESSION","valueFrom":{"configMapKeyRef":{"key":"redis.compression","name":"argocd-cmd-params-cm","optional":true}}},{"name":"REDISDB","valueFrom":{"configMapKeyRef":{"key":"redis.db","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_DEFAULT_CACHE_EXPIRATION","valueFrom":{"configMapKeyRef":{"key":"server.default.cache.expiration","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_MAX_COOKIE_NUMBER","valueFrom":{"configMapKeyRef":{"key":"server.http.cookie.maxnumber","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_LISTEN_ADDRESS","valueFrom":{"configMapKeyRef":{"key":"server.listen.address","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_METRICS_LISTEN_ADDRESS","valueFrom":{"configMapKeyRef":{"key":"server.metrics.listen.address","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_OTLP_ADDRESS","valueFrom":{"configMapKeyRef":{"key":"otlp.address","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_OTLP_INSECURE","valueFrom":{"configMapKeyRef":{"key":"otlp.insecure","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_OTLP_HEADERS","valueFrom":{"configMapKeyRef":{"key":"otlp.headers","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_APPLICATION_NAMESPACES","valueFrom":{"configMapKeyRef":{"key":"application.namespaces","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_SERVER_ENABLE_PROXY_EXTENSION","valueFrom":{"configMapKeyRef":{"key":"server.enable.proxy.extension","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_K8SCLIENT_RETRY_MAX","valueFrom":{"configMapKeyRef":{"key":"server.k8sclient.retry.max","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_K8SCLIENT_RETRY_BASE_BACKOFF","valueFrom":{"configMapKeyRef":{"key":"server.k8sclient.retry.base.backoff","name":"argocd-cmd-params-cm","optional":true}}},{"name":"ARGOCD_API_CONTENT_TYPES","valueFrom":{"configMapKeyRef":{"key":"server.api.content.types","name":"argocd-cmd-params-cm","optional":true}}}],"image":"quay.io/argoproj/argocd:v2.12.2","imagePullPolicy":"Always","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/healthz?full=true","port":8080,"scheme":"HTTP"},"initialDelaySeconds":3,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":5},"name":"argocd-server","ports":[{"containerPort":8080,"protocol":"TCP"},{"containerPort":8083,"protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/healthz","port":8080,"scheme":"HTTP"},"initialDelaySeconds":3,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":1},"resources":{},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/app/config/ssh","name":"ssh-known-hosts"},{"mountPath":"/app/config/tls","name":"tls-certs"},{"mountPath":"/app/config/server/tls","name":"argocd-repo-server-tls"},{"mountPath":"/app/config/dex/tls","name":"argocd-dex-server-tls"},{"mountPath":"/home/argocd","name":"plugins-home"},{"mountPath":"/tmp","name":"tmp"}]}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"serviceAccount":"argocd-server","serviceAccountName":"argocd-server","terminationGracePeriodSeconds":30,"volumes":[{"emptyDir":{},"name":"plugins-home"},{"emptyDir":{},"name":"tmp"},{"configMap":{"defaultMode":420,"name":"argocd-ssh-known-hosts-cm"},"name":"ssh-known-hosts"},{"configMap":{"defaultMode":420,"name":"argocd-tls-certs-cm"},"name":"tls-certs"},{"name":"argocd-repo-server-tls","secret":{"defaultMode":420,"items":[{"key":"tls.crt","path":"tls.crt"},{"key":"tls.key","path":"tls.key"},{"key":"ca.crt","path":"ca.crt"}],"optional":true,"secretName":"argocd-repo-server-tls"}},{"name":"argocd-dex-server-tls","secret":{"defaultMode":420,"items":[{"key":"tls.crt","path":"tls.crt"},{"key":"ca.crt","path":"ca.crt"}],"optional":true,"secretName":"argocd-dex-server-tls"}}]}}},"status":{"availableReplicas":1,"conditions":[{"lastTransitionTime":"2024-08-26T10:40:32Z","lastUpdateTime":"2024-08-26T10:40:32Z","message":"Deployment has minimum availability.","reason":"MinimumReplicasAvailable","status":"True","type":"Available"},{"lastTransitionTime":"2024-08-26T10:30:17Z","lastUpdateTime":"2024-08-26T10:40:32Z","message":"ReplicaSet \"argocd-server-695856ffcb\" has successfully progressed.","reason":"NewReplicaSetAvailable","status":"True","type":"Progressing"}],"observedGeneration":3,"readyReplicas":1,"replicas":1,"updatedReplicas":1}}
+    creationTimestamp: "2024-08-26T10:30:17Z"
+    generation: 4
+    labels:
+      app.kubernetes.io/component: server
+      app.kubernetes.io/name: argocd-server
+      app.kubernetes.io/part-of: argocd
+    name: argocd-server
+    namespace: argocd
+    resourceVersion: "90507"
+    uid: e1707ace-1c95-4286-b7d1-0cf114522b92
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: argocd-server
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/name: argocd-server
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: argocd-server
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/part-of: argocd
+                topologyKey: kubernetes.io/hostname
+              weight: 5
+        containers:
+        - args:
+          - /usr/local/bin/argocd-server
+          - --rootpath=/argo-cd
+          - --insecure
+          env:
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: auth
+                name: argocd-redis
+          - name: ARGOCD_SERVER_INSECURE
+            valueFrom:
+              configMapKeyRef:
+                key: server.insecure
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_BASEHREF
+            valueFrom:
+              configMapKeyRef:
+                key: server.basehref
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_ROOTPATH
+            valueFrom:
+              configMapKeyRef:
+                key: server.rootpath
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_LOGFORMAT
+            valueFrom:
+              configMapKeyRef:
+                key: server.log.format
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_LOG_LEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: server.log.level
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_REPO_SERVER
+            valueFrom:
+              configMapKeyRef:
+                key: repo.server
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_DEX_SERVER
+            valueFrom:
+              configMapKeyRef:
+                key: server.dex.server
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_DISABLE_AUTH
+            valueFrom:
+              configMapKeyRef:
+                key: server.disable.auth
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_ENABLE_GZIP
+            valueFrom:
+              configMapKeyRef:
+                key: server.enable.gzip
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_REPO_SERVER_TIMEOUT_SECONDS
+            valueFrom:
+              configMapKeyRef:
+                key: server.repo.server.timeout.seconds
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_X_FRAME_OPTIONS
+            valueFrom:
+              configMapKeyRef:
+                key: server.x.frame.options
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_CONTENT_SECURITY_POLICY
+            valueFrom:
+              configMapKeyRef:
+                key: server.content.security.policy
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_REPO_SERVER_PLAINTEXT
+            valueFrom:
+              configMapKeyRef:
+                key: server.repo.server.plaintext
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_REPO_SERVER_STRICT_TLS
+            valueFrom:
+              configMapKeyRef:
+                key: server.repo.server.strict.tls
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_DEX_SERVER_PLAINTEXT
+            valueFrom:
+              configMapKeyRef:
+                key: server.dex.server.plaintext
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_DEX_SERVER_STRICT_TLS
+            valueFrom:
+              configMapKeyRef:
+                key: server.dex.server.strict.tls
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_TLS_MIN_VERSION
+            valueFrom:
+              configMapKeyRef:
+                key: server.tls.minversion
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_TLS_MAX_VERSION
+            valueFrom:
+              configMapKeyRef:
+                key: server.tls.maxversion
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_TLS_CIPHERS
+            valueFrom:
+              configMapKeyRef:
+                key: server.tls.ciphers
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_CONNECTION_STATUS_CACHE_EXPIRATION
+            valueFrom:
+              configMapKeyRef:
+                key: server.connection.status.cache.expiration
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_OIDC_CACHE_EXPIRATION
+            valueFrom:
+              configMapKeyRef:
+                key: server.oidc.cache.expiration
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_LOGIN_ATTEMPTS_EXPIRATION
+            valueFrom:
+              configMapKeyRef:
+                key: server.login.attempts.expiration
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_STATIC_ASSETS
+            valueFrom:
+              configMapKeyRef:
+                key: server.staticassets
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APP_STATE_CACHE_EXPIRATION
+            valueFrom:
+              configMapKeyRef:
+                key: server.app.state.cache.expiration
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: REDIS_SERVER
+            valueFrom:
+              configMapKeyRef:
+                key: redis.server
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: REDIS_COMPRESSION
+            valueFrom:
+              configMapKeyRef:
+                key: redis.compression
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: REDISDB
+            valueFrom:
+              configMapKeyRef:
+                key: redis.db
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_DEFAULT_CACHE_EXPIRATION
+            valueFrom:
+              configMapKeyRef:
+                key: server.default.cache.expiration
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_MAX_COOKIE_NUMBER
+            valueFrom:
+              configMapKeyRef:
+                key: server.http.cookie.maxnumber
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_LISTEN_ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                key: server.listen.address
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_METRICS_LISTEN_ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                key: server.metrics.listen.address
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_OTLP_ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                key: otlp.address
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_OTLP_INSECURE
+            valueFrom:
+              configMapKeyRef:
+                key: otlp.insecure
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_OTLP_HEADERS
+            valueFrom:
+              configMapKeyRef:
+                key: otlp.headers
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_APPLICATION_NAMESPACES
+            valueFrom:
+              configMapKeyRef:
+                key: application.namespaces
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_SERVER_ENABLE_PROXY_EXTENSION
+            valueFrom:
+              configMapKeyRef:
+                key: server.enable.proxy.extension
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_K8SCLIENT_RETRY_MAX
+            valueFrom:
+              configMapKeyRef:
+                key: server.k8sclient.retry.max
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_K8SCLIENT_RETRY_BASE_BACKOFF
+            valueFrom:
+              configMapKeyRef:
+                key: server.k8sclient.retry.base.backoff
+                name: argocd-cmd-params-cm
+                optional: true
+          - name: ARGOCD_API_CONTENT_TYPES
+            valueFrom:
+              configMapKeyRef:
+                key: server.api.content.types
+                name: argocd-cmd-params-cm
+                optional: true
+          image: quay.io/argoproj/argocd:v2.12.2
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz?full=true
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: argocd-server
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8083
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/config/ssh
+            name: ssh-known-hosts
+          - mountPath: /app/config/tls
+            name: tls-certs
+          - mountPath: /app/config/server/tls
+            name: argocd-repo-server-tls
+          - mountPath: /app/config/dex/tls
+            name: argocd-dex-server-tls
+          - mountPath: /home/argocd
+            name: plugins-home
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: argocd-server
+        serviceAccountName: argocd-server
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: plugins-home
+        - emptyDir: {}
+          name: tmp
+        - configMap:
+            defaultMode: 420
+            name: argocd-ssh-known-hosts-cm
+          name: ssh-known-hosts
+        - configMap:
+            defaultMode: 420
+            name: argocd-tls-certs-cm
+          name: tls-certs
+        - name: argocd-repo-server-tls
+          secret:
+            defaultMode: 420
+            items:
+            - key: tls.crt
+              path: tls.crt
+            - key: tls.key
+              path: tls.key
+            - key: ca.crt
+              path: ca.crt
+            optional: true
+            secretName: argocd-repo-server-tls
+        - name: argocd-dex-server-tls
+          secret:
+            defaultMode: 420
+            items:
+            - key: tls.crt
+              path: tls.crt
+            - key: ca.crt
+              path: ca.crt
+            optional: true
+            secretName: argocd-dex-server-tls
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-08-26T10:40:32Z"
+      lastUpdateTime: "2024-08-26T10:40:32Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2024-08-26T10:30:17Z"
+      lastUpdateTime: "2024-08-26T10:46:15Z"
+      message: ReplicaSet "argocd-server-5f684cb76" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 4
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"cypress","app.kubernetes.io/instance":"vikunja-app"},"name":"cypress","namespace":"demoproject"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"cypress"}},"template":{"metadata":{"labels":{"app":"cypress"}},"spec":{"containers":[{"env":[{"name":"CYPRESS_API_URL","value":"http://api:3456/api/v1"},{"name":"CYPRESS_TEST_SECRET","value":"averyLongSecretToSe33dtheDB"}],"image":"cypress/browsers:node18.12.0-chrome107","name":"cypress","ports":[{"containerPort":8080}],"volumeMounts":[{"mountPath":"/project","name":"project-volume"},{"mountPath":"/home/node/.cache/","name":"cache-volume"}],"workingDir":"/project"}],"volumes":[{"hostPath":{"path":"/path/to/your/project"},"name":"project-volume"},{"hostPath":{"path":"/path/to/your/cache"},"name":"cache-volume"}]}}}}
+    creationTimestamp: "2024-08-26T10:29:49Z"
+    generation: 2
+    labels:
+      app: cypress
+      app.kubernetes.io/instance: vikunja-app
+    name: cypress
+    namespace: demoproject
+    resourceVersion: "90214"
+    uid: e866f204-2f18-4d92-a229-27f29aee14e2
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: cypress
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: cypress
+      spec:
+        containers:
+        - env:
+          - name: CYPRESS_API_URL
+            value: http://api:3456/api/v1
+          - name: CYPRESS_TEST_SECRET
+            value: averyLongSecretToSe33dtheDB
+          image: cypress/browsers:node18.12.0-chrome107
+          imagePullPolicy: IfNotPresent
+          name: cypress
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /project
+            name: project-volume
+          - mountPath: /home/node/.cache/
+            name: cache-volume
+          workingDir: /project
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /path/to/your/project
+            type: ""
+          name: project-volume
+        - hostPath:
+            path: /path/to/your/cache
+            type: ""
+          name: cache-volume
+  status:
+    conditions:
+    - lastTransitionTime: "2024-08-26T10:29:49Z"
+      lastUpdateTime: "2024-08-26T10:29:49Z"
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: "False"
+      type: Available
+    - lastTransitionTime: "2024-08-26T10:39:50Z"
+      lastUpdateTime: "2024-08-26T10:39:50Z"
+      message: ReplicaSet "cypress-6f57665fd5" has timed out progressing.
+      reason: ProgressDeadlineExceeded
+      status: "False"
+      type: Progressing
+    observedGeneration: 2
+    replicas: 1
+    unavailableReplicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"vikunja-app"},"name":"vikunja","namespace":"demoproject"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"vikunja"}},"template":{"metadata":{"labels":{"app":"vikunja"}},"spec":{"containers":[{"env":[{"name":"VIKUNJA_SERVICE_ROOTPATH","value":"/app/vikunja/"},{"name":"VIKUNJA_DATABASE_PATH","value":"/db/vikunja.db"}],"image":"eshahmeer/vikunja:latest","name":"vikunja","ports":[{"containerPort":3456}],"securityContext":{"runAsUser":1000},"volumeMounts":[{"mountPath":"/db","name":"vikunja-db"}]}],"volumes":[{"name":"vikunja-db","persistentVolumeClaim":{"claimName":"vikunja-pvc"}}]}}}}
+    creationTimestamp: "2024-08-26T10:29:49Z"
+    generation: 2
+    labels:
+      app.kubernetes.io/instance: vikunja-app
+    name: vikunja
+    namespace: demoproject
+    resourceVersion: "90210"
+    uid: e8a43644-5a31-48af-9585-565f3c25d5c9
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: vikunja
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: vikunja
+      spec:
+        containers:
+        - env:
+          - name: VIKUNJA_SERVICE_ROOTPATH
+            value: /app/vikunja/
+          - name: VIKUNJA_DATABASE_PATH
+            value: /db/vikunja.db
+          image: eshahmeer/vikunja:latest
+          imagePullPolicy: Always
+          name: vikunja
+          ports:
+          - containerPort: 3456
+            protocol: TCP
+          resources: {}
+          securityContext:
+            runAsUser: 1000
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /db
+            name: vikunja-db
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: vikunja-db
+          persistentVolumeClaim:
+            claimName: vikunja-pvc
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-08-26T10:29:55Z"
+      lastUpdateTime: "2024-08-26T10:29:55Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2024-08-26T10:29:49Z"
+      lastUpdateTime: "2024-08-26T10:29:55Z"
+      message: ReplicaSet "vikunja-8675877879" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"vikunja-api","app.kubernetes.io/instance":"vikunja-app"},"name":"vikunja-api","namespace":"demoproject"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"vikunja-api"}},"template":{"metadata":{"labels":{"app":"vikunja-api"}},"spec":{"containers":[{"env":[{"name":"VIKUNJA_LOG_LEVEL","value":"DEBUG"},{"name":"VIKUNJA_SERVICE_TESTINGTOKEN","value":"averyLongSecretToSe33dtheDB"},{"name":"VIKUNJA_DATABASE_PATH","value":"/db/vikunja.db"}],"image":"vikunja/vikunja:latest","name":"vikunja-api","ports":[{"containerPort":3456}],"securityContext":{"runAsUser":1000},"volumeMounts":[{"mountPath":"/db","name":"vikunja-db"}]}],"volumes":[{"name":"vikunja-db","persistentVolumeClaim":{"claimName":"vikunja-pvc"}}]}}}}
+    creationTimestamp: "2024-08-26T10:29:49Z"
+    generation: 2
+    labels:
+      app: vikunja-api
+      app.kubernetes.io/instance: vikunja-app
+    name: vikunja-api
+    namespace: demoproject
+    resourceVersion: "90211"
+    uid: 5cb4c268-a51e-40e1-a07c-4e2bcc8e4209
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: vikunja-api
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: vikunja-api
+      spec:
+        containers:
+        - env:
+          - name: VIKUNJA_LOG_LEVEL
+            value: DEBUG
+          - name: VIKUNJA_SERVICE_TESTINGTOKEN
+            value: averyLongSecretToSe33dtheDB
+          - name: VIKUNJA_DATABASE_PATH
+            value: /db/vikunja.db
+          image: vikunja/vikunja:latest
+          imagePullPolicy: Always
+          name: vikunja-api
+          ports:
+          - containerPort: 3456
+            protocol: TCP
+          resources: {}
+          securityContext:
+            runAsUser: 1000
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /db
+            name: vikunja-db
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: vikunja-db
+          persistentVolumeClaim:
+            claimName: vikunja-pvc
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-08-26T10:29:58Z"
+      lastUpdateTime: "2024-08-26T10:29:58Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2024-08-26T10:29:49Z"
+      lastUpdateTime: "2024-08-26T10:29:58Z"
+      message: ReplicaSet "vikunja-api-646485f5b" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+    creationTimestamp: "2024-08-22T07:41:57Z"
+    generation: 2
+    labels:
+      k8s-app: kube-dns
+    name: coredns
+    namespace: kube-system
+    resourceVersion: "87830"
+    uid: 724058a7-d95e-4ad8-b7e7-f1e5c594ae8c
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        k8s-app: kube-dns
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 1
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          k8s-app: kube-dns
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: k8s-app
+                    operator: In
+                    values:
+                    - kube-dns
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - args:
+          - -conf
+          - /etc/coredns/Corefile
+          image: registry.k8s.io/coredns/coredns:v1.11.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: coredns
+          ports:
+          - containerPort: 53
+            name: dns
+            protocol: UDP
+          - containerPort: 53
+            name: dns-tcp
+            protocol: TCP
+          - containerPort: 9153
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 8181
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 170Mi
+            requests:
+              cpu: 100m
+              memory: 70Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+              - NET_BIND_SERVICE
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/coredns
+            name: config-volume
+            readOnly: true
+        dnsPolicy: Default
+        nodeSelector:
+          kubernetes.io/os: linux
+        priorityClassName: system-cluster-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: coredns
+        serviceAccountName: coredns
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+        volumes:
+        - configMap:
+            defaultMode: 420
+            items:
+            - key: Corefile
+              path: Corefile
+            name: coredns
+          name: config-volume
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-08-22T07:42:10Z"
+      lastUpdateTime: "2024-08-22T07:42:10Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2024-08-22T07:42:10Z"
+      lastUpdateTime: "2024-08-22T07:42:52Z"
+      message: ReplicaSet "coredns-7db6d8ff4d" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""
